@@ -30,7 +30,7 @@ public class Number extends Container {
 		value /= x;
 	}
 
-	public void mod(double x) {
+	public void getRemainder(double x) {
 		value %= x;
 	}
 
