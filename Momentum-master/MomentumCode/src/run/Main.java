@@ -271,83 +271,97 @@ public class Main extends JPanel {
 		}
 	}
 
-	public void changeNumber(String change) {
-		double d = Double.parseDouble(change.substring(change.indexOf("=") + 1, change.length() - 1).trim());
-		if (change.contains("+=")) {
-			String name = change.substring(0, change.indexOf("+")).trim();
+	public void changeNumber() {
+		if (ck[2].equals("=")) {
 			for (int i = 0; i < numbers.size(); i++) {
-				if (numbers.get(i).getName().trim().equals(name)) {
-					numbers.get(i).add(d);
-				}
+				if (numbers.get(i).getName().trim().equals(ck[1]))
+					numbers.get(i).setValue(Double.parseDouble(ck[3]));
 			}
-		} else if (change.contains("-=")) {
-			String name = change.substring(0, change.indexOf("-")).trim();
+		} else if (ck[2].equals("+=")) {
 			for (int i = 0; i < numbers.size(); i++) {
-				if (numbers.get(i).getName().trim().equals(name)) {
-					numbers.get(i).subtract(d);
-				}
+				if (numbers.get(i).getName().trim().equals(ck[1]))
+					numbers.get(i).add(Double.parseDouble(ck[3]));
 			}
-		} else if (change.contains("*=")) {
-			String name = change.substring(7, change.indexOf("*")).trim();
+		} else if (ck[2].equals("-=")) {
 			for (int i = 0; i < numbers.size(); i++) {
-				if (numbers.get(i).getName().trim().equals(name)) {
-					numbers.get(i).multiplyBy(d);
-				}
+				if (numbers.get(i).getName().trim().equals(ck[1]))
+					numbers.get(i).subtract(Double.parseDouble(ck[3]));
 			}
-		} else if (change.contains("/=")) {
-			String name = change.substring(0, change.indexOf("/")).trim();
+		} else if (ck[2].equals("*=")) {
 			for (int i = 0; i < numbers.size(); i++) {
-				if (numbers.get(i).getName().trim().equals(name)) {
-					numbers.get(i).divideBy(d);
-				}
+				if (numbers.get(i).getName().trim().equals(ck[1]))
+					numbers.get(i).multiplyBy(Double.parseDouble(ck[3]));
 			}
-		} else if (change.contains("=")) {
-			String name = change.substring(0, change.indexOf("=")).trim();
+		} else if (ck[2].equals("/=")) {
 			for (int i = 0; i < numbers.size(); i++) {
-				if (numbers.get(i).getName().trim().equals(name)) {
-					numbers.get(i).setValue(d);
-				}
+				if (numbers.get(i).getName().trim().equals(ck[1]))
+					numbers.get(i).divideBy(Double.parseDouble(ck[3]));
 			}
 		}
 	}
 
-	public void changeCond(String change) {
-		boolean b = false;
-		String name = change.substring(0, change.indexOf("=")).trim();
-		for (int i = 0; i < conds.size(); i++) {
-			if (conds.get(i).getName().trim().equals(name)) {
-				conds.get(i).setCond(b);
+	public void changeCond() {
+		if (ck[3].equals("true")) {
+			for (int i = 0; i < conds.size(); i++) {
+				if (conds.get(i).getName().trim().equals(ck[1]))
+					conds.get(i).setCond(true);
+			}
+		} else if (ck[3].equals("false")) {
+			for (int i = 0; i < conds.size(); i++) {
+				if (conds.get(i).getName().trim().equals(ck[1]))
+					conds.get(i).setCond(false);
 			}
 		}
 	}
 
 	public void changeText(String change) {
-//		System.out.println(change);
-		String s = change.substring(change.indexOf("\""), change.lastIndexOf("\"")).trim();
-		if (change.contains("+=")) {
-			String name = change.substring(8, change.indexOf("+")).trim();
+//		String s = change.substring(change.indexOf("\""), change.lastIndexOf("\"")).trim();
+//		if (change.contains("+=")) {
+//			String name = change.substring(8, change.indexOf("+")).trim();
+//			for (int i = 0; i < texts.size(); i++) {
+//				if (texts.get(i).getName().trim().equals(name)) {
+//					texts.get(i).addText(s);
+//				}
+//			}
+//		} else if (change.contains("=")) {
+//			String name = change.substring(8, change.indexOf("=")).trim();
+//			for (int i = 0; i < texts.size(); i++) {
+//				if (texts.get(i).getName().trim().equals(name)) {
+//					texts.get(i).setText(s.substring(1));
+//				}
+//			}
+//		}
+
+		if (ck[2].trim().equals("=")) {
 			for (int i = 0; i < texts.size(); i++) {
-				if (texts.get(i).getName().trim().equals(name)) {
-					texts.get(i).addText(s);
+				if (texts.get(i).getName().trim().equals(ck[1])) {
+					texts.get(i).setText(currentStatement.substring(currentStatement.indexOf("\""),
+							currentStatement.lastIndexOf("\"") + 1));
 				}
 			}
-		} else if (change.contains("=")) {
-			String name = change.substring(8, change.indexOf("=")).trim();
+		} else if (ck[2].trim().equals("+=")) {
 			for (int i = 0; i < texts.size(); i++) {
-				if (texts.get(i).getName().trim().equals(name)) {
-					texts.get(i).setText(s.substring(1));
+				if (texts.get(i).getName().trim().equals(ck[1])) {
+					System.out.println(texts.get(i).getText());
+					texts.get(i).setText(texts.get(i).getText() + currentStatement
+							.substring(currentStatement.indexOf("\""), currentStatement.lastIndexOf("\"") + 1));
 				}
 			}
 		}
 	}
 
-	public void changeLetter(String change) {
-		char c = change.charAt(change.lastIndexOf("\'") - 1);
-		String name = change.substring(0, change.indexOf("=")).trim();
+	public void changeLetter() {
+//		char c = change.charAt(change.lastIndexOf("\'") - 1);
+//		String name = change.substring(0, change.indexOf("=")).trim();
+//		for (int i = 0; i < letters.size(); i++) {
+//			if (letters.get(i).getName().trim().equals(name)) {
+//				letters.get(i).setLetter(c);
+//			}
+//		}
+
 		for (int i = 0; i < letters.size(); i++) {
-			if (letters.get(i).getName().trim().equals(name)) {
-				letters.get(i).setLetter(c);
-			}
+			if (letters.get(i).getName().trim().equals(ck[1]))
+				letters.get(i).setLetter(ck[3].charAt(1));
 		}
 	}
 
@@ -402,7 +416,7 @@ public class Main extends JPanel {
 
 	public void processLetter(int index) {
 		if (isNewVariable(ck[1 + index])) {
-			letters.add(new Letter(ck[1 + index], ck[3 + index].charAt(0)));
+			letters.add(new Letter(ck[1 + index], ck[3 + index].charAt(1)));
 		}
 	}
 
@@ -410,7 +424,9 @@ public class Main extends JPanel {
 		boolean isQuote = false;
 		for (int j = 1; j < ck.length; j++) {
 			if (isQuote) {
-				if (ck[j + index].charAt(ck[j + index].length() - 1) == '"') {
+				if (ck[j + index].equals("")) {
+					consoleArea.append(" ");
+				} else if (ck[j + index].charAt(ck[j + index].length() - 1) == '"') {
 					isQuote = !isQuote;
 					consoleArea.append(ck[j + index].substring(0, ck[j + index].length() - 1) + " ");
 				} else
@@ -419,7 +435,7 @@ public class Main extends JPanel {
 
 				if (ck[j + index].charAt(0) == '"') {
 					isQuote = !isQuote;
-					if (ck[j + index].charAt(ck[j + index].length() - 1) == '"') {
+					if (ck[j + index].charAt(ck[j + index].length() - 1) == '"' && ck[j + index].length() != 1) {
 						consoleArea.append(ck[j + index].substring(1, ck[j + index].length() - 1) + " ");
 						isQuote = !isQuote;
 					} else
@@ -451,13 +467,13 @@ public class Main extends JPanel {
 		for (int b = 0; b < numbers.size(); b++) {
 			if (numbers.get(b).getName().trim().equals(ck[1])) {
 				dataType = "number";
-				changeNumber(currentStatement);
+				changeNumber();
 			}
 		}
 		for (int y = 0; y < conds.size(); y++) {
 			if (conds.get(y).getName().trim().equals(ck[1])) {
 				dataType = "cond";
-				changeCond(currentStatement);
+				changeCond();
 			}
 		}
 		for (int x = 0; x < texts.size(); x++) {
@@ -469,7 +485,7 @@ public class Main extends JPanel {
 		for (int e = 0; e < letters.size(); e++) {
 			if (letters.get(e).getName().trim().equals(ck[1])) {
 				dataType = "letter";
-				changeLetter(currentStatement);
+				changeLetter();
 			}
 		}
 	}
