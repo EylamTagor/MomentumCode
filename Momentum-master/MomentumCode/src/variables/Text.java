@@ -1,3 +1,4 @@
+package variables;
 public class Text extends Container {
 	String text;
 

@@ -1,3 +1,5 @@
+package run;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -17,9 +19,13 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import variables.Cond;
+import variables.Letter;
+import variables.Number;
+import variables.Text;
 
 public class Main extends JPanel {
 	private String fileName;
@@ -90,7 +96,7 @@ public class Main extends JPanel {
 				reset();
 
 				reset();
-				codeList = editor.getText().split(":\\)");
+				codeList = editor.getText().split("\n");
 
 				for (int i = 0; i < codeList.length; i++) {
 					currentStatement = codeList[i].replace("\r", "");
@@ -100,8 +106,14 @@ public class Main extends JPanel {
 
 					String tag = ck[0];
 
-					if (tag.equals("Container")) {
-						processContainer(0);
+					if (tag.equals("Number")) {
+						processNumber(0);
+					} else if (tag.equals("Text")) {
+						processText(0);
+					} else if (tag.equals("Letter")) {
+						processLetter(0);
+					} else if (tag.equals("Cond")) {
+						processCond(0);
 					} else if (tag.equals("Print")) {
 						processPrint(0);
 					} else if (tag.equals("Change")) {
@@ -339,27 +351,58 @@ public class Main extends JPanel {
 		}
 	}
 
-	public void processContainer(int index) {
-		String dataType = ck[1 + index];
-		if (isNewVariable(ck[2 + index])) {
-			if (dataType.equals("number")) {
-				if (!ck[4 + index].contains("."))
-					ck[4 + index] = ck[4 + index] + ".0";
-				numbers.add(new Number(ck[2 + index], Double.parseDouble(ck[4 + index])));
-			} else if (dataType.equals("text")) {
-				String txt = ck[4 + index];
-				for (int j = 5; j < ck.length; j++)
-					txt += " " + ck[j + index];
-				texts.add(new Text(ck[2 + index], txt));
+//	public void processContainer(int index, String dataType) {
+//		if (isNewVariable(ck[1 + index])) {
+//			if (dataType.equals("number")) {
+//				if (!ck[3 + index].contains("."))
+//					ck[3 + index] = ck[3 + index] + ".0";
+//				numbers.add(new Number(ck[2 + index], Double.parseDouble(ck[4 + index])));
+//			} else if (dataType.equals("text")) {
+//				String txt = ck[3 + index];
+//				for (int j = 4; j < ck.length; j++)
+//					txt += " " + ck[j + index];
+//				texts.add(new Text(ck[1 + index], txt));
+//
+//			} else if (dataType.equals("cond")) {
+//				if (ck[3 + index].equals("true"))
+//					conds.add(new Cond(ck[1 + index], true));
+//				else
+//					conds.add(new Cond(ck[1 + index], false));
+//			}
+//			if (dataType.equals("letter"))
+//				letters.add(new Letter(ck[1 + index], ck[3 + index].charAt(0)));
+//		}
+//	}
 
-			} else if (dataType.equals("cond")) {
-				if (ck[4 + index].equals("true"))
-					conds.add(new Cond(ck[2 + index], true));
-				else
-					conds.add(new Cond(ck[2 + index], false));
-			}
-			if (dataType.equals("letter"))
-				letters.add(new Letter(ck[2 + index], ck[4 + index].charAt(0)));
+	public void processNumber(int index) {
+		if (isNewVariable(ck[1 + index])) {
+			if (!ck[3 + index].contains("."))
+				ck[3 + index] += ".0";
+			numbers.add(new Number(ck[1 + index], Double.parseDouble(ck[3 + index])));
+		}
+	}
+
+	public void processText(int index) {
+		if (isNewVariable(ck[1 + index])) {
+			String txt = ck[3 + index];
+			for (int j = 4; j < ck.length; j++)
+				txt += " " + ck[j + index];
+			texts.add(new Text(ck[1 + index], txt));
+		}
+	}
+
+	public void processCond(int index) {
+		if (isNewVariable(ck[1 + index])) {
+			if (ck[3 + index].equals("true"))
+				conds.add(new Cond(ck[1 + index], true));
+			else
+				conds.add(new Cond(ck[1 + index], false));
+		}
+	}
+
+	public void processLetter(int index) {
+		if (isNewVariable(ck[1 + index])) {
+			letters.add(new Letter(ck[1 + index], ck[3 + index].charAt(0)));
 		}
 	}
 
@@ -367,7 +410,7 @@ public class Main extends JPanel {
 		boolean isQuote = false;
 		for (int j = 1; j < ck.length; j++) {
 			if (isQuote) {
-				if (ck[j = index].charAt(ck[j + index].length() - 1) == '"') {
+				if (ck[j + index].charAt(ck[j + index].length() - 1) == '"') {
 					isQuote = !isQuote;
 					consoleArea.append(ck[j + index].substring(0, ck[j + index].length() - 1) + " ");
 				} else
@@ -398,8 +441,8 @@ public class Main extends JPanel {
 				processChange();
 			else if (ck[4].equals("Print"))
 				processPrint(4);
-			else if (ck[4].equals("Container"))
-				processContainer(4);
+//			else if (ck[4].equals("Container"))
+//				processContainer(4, ck[5]);
 		}
 	}
 

@@ -1,3 +1,4 @@
+package variables;
 public class Number extends Container {
 	double value;
 

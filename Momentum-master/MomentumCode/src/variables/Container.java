@@ -1,3 +1,4 @@
+package variables;
 public abstract class Container {
 	private String type;
 

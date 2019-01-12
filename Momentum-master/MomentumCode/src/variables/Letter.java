@@ -1,3 +1,4 @@
+package variables;
 public class Letter extends Container {
 	char character;
 
