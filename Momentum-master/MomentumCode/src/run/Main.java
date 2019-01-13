@@ -120,6 +120,8 @@ public class Main extends JPanel {
 						processChange();
 					} else if (tag.equals("If")) {
 						processIf();
+					} else if (tag.equals("Loop")) {
+						processLoop(i);
 					}
 				}
 			}
@@ -176,21 +178,21 @@ public class Main extends JPanel {
 		double d1 = 0, d2 = 0;
 		String op = "";
 		int opNum = 0;
-		if (cond.contains(">")) {
-			op = ">";
-			opNum = 1;
-//			System.out.println(1);
-		} else if (cond.contains("<")) {
-			op = "<";
-			opNum = 2;
-//			System.out.println(2);
-		} else if (cond.contains(">=")) {
+		if (cond.contains(">=")) {
 			op = ">=";
 			opNum = 3;
-//			System.out.println(3);
+//			System.out.println(1);
 		} else if (cond.contains("<=")) {
 			op = "<=";
 			opNum = 4;
+//			System.out.println(2);
+		} else if (cond.contains(">")) {
+			op = ">";
+			opNum = 1;
+//			System.out.println(3);
+		} else if (cond.contains("<")) {
+			op = "<";
+			opNum = 2;
 //			System.out.println(4);
 		} else if (cond.contains("==")) {
 			op = "==";
@@ -314,7 +316,7 @@ public class Main extends JPanel {
 		}
 	}
 
-	public void changeText(String change) {
+	public void changeText() {
 //		String s = change.substring(change.indexOf("\""), change.lastIndexOf("\"")).trim();
 //		if (change.contains("+=")) {
 //			String name = change.substring(8, change.indexOf("+")).trim();
@@ -398,10 +400,33 @@ public class Main extends JPanel {
 
 	public void processText(int index) {
 		if (isNewVariable(ck[1 + index])) {
-			String txt = ck[3 + index];
-			for (int j = 4; j < ck.length; j++)
-				txt += " " + ck[j + index];
-			texts.add(new Text(ck[1 + index], txt));
+			String txt = "";
+			boolean isQuote = false;
+
+			for (int i = 3 + index; i < ck.length; i++) {
+				if (isQuote) {
+					if (ck[i].equals("")) {
+						consoleArea.append(" ");
+					} else if (ck[i].charAt(ck[i].length() - 1) == '"') {
+						isQuote = !isQuote;
+						consoleArea.append(ck[i].substring(0, ck[i].length() - 1) + " ");
+					} else
+						consoleArea.append(ck[i] + " ");
+				} else {
+
+					if (!ck[i].equals("") && ck[i].charAt(0) == '"') {
+						isQuote = !isQuote;
+						if (ck[i].charAt(ck[i].length() - 1) == '"' && ck[i].length() != 1) {
+							consoleArea.append(ck[i].substring(1, ck[i].length() - 1) + " ");
+							isQuote = !isQuote;
+						} else
+							consoleArea.append(ck[i].substring(1) + " ");
+					} else
+						printVariable(ck[i]);
+				}
+
+			}
+
 		}
 	}
 
@@ -422,26 +447,26 @@ public class Main extends JPanel {
 
 	public void processPrint(int index) {
 		boolean isQuote = false;
-		for (int j = 1; j < ck.length; j++) {
+		for (int j = 1 + index; j < ck.length; j++) {
 			if (isQuote) {
-				if (ck[j + index].equals("")) {
+				if (ck[j].equals("")) {
 					consoleArea.append(" ");
-				} else if (ck[j + index].charAt(ck[j + index].length() - 1) == '"') {
+				} else if (ck[j].charAt(ck[j].length() - 1) == '"') {
 					isQuote = !isQuote;
-					consoleArea.append(ck[j + index].substring(0, ck[j + index].length() - 1) + " ");
+					consoleArea.append(ck[j].substring(0, ck[j].length() - 1) + " ");
 				} else
-					consoleArea.append(ck[j + index] + " ");
+					consoleArea.append(ck[j] + " ");
 			} else {
-
-				if (ck[j + index].charAt(0) == '"') {
+				if (!ck[j].equals("") && ck[j].charAt(0) == '"') {
 					isQuote = !isQuote;
-					if (ck[j + index].charAt(ck[j + index].length() - 1) == '"' && ck[j + index].length() != 1) {
-						consoleArea.append(ck[j + index].substring(1, ck[j + index].length() - 1) + " ");
+					if (ck[j].charAt(ck[j].length() - 1) == '"' && ck[j].length() != 1) {
+						consoleArea.append(ck[j].substring(1, ck[j].length() - 1) + " ");
 						isQuote = !isQuote;
 					} else
-						consoleArea.append(ck[j + index].substring(1) + " ");
-				} else
-					printVariable(ck[j + index]);
+						consoleArea.append(ck[j].substring(1) + " ");
+				} else {
+					printVariable(ck[j]);
+				}
 			}
 		}
 
@@ -479,7 +504,7 @@ public class Main extends JPanel {
 		for (int x = 0; x < texts.size(); x++) {
 			if (texts.get(x).getName().trim().equals(ck[1])) {
 				dataType = "text";
-				changeText(currentStatement);
+				changeText();
 			}
 		}
 		for (int e = 0; e < letters.size(); e++) {
@@ -487,6 +512,41 @@ public class Main extends JPanel {
 				dataType = "letter";
 				changeLetter();
 			}
+		}
+	}
+
+	public void processLoop(int j) {
+		int times = Integer.parseInt(ck[1]);
+		int original = j;
+		for (int i = 1; i < times; i++) {
+			while (!currentStatement.equals("End")) {
+				currentStatement = codeList[j].replace("\r", "");
+				currentStatement = currentStatement.replace("\n", "");
+				ck = currentStatement.split(" ");
+
+				String tag = ck[0];
+
+				if (tag.equals("Number")) {
+					processNumber(0);
+				} else if (tag.equals("Text")) {
+					processText(0);
+				} else if (tag.equals("Letter")) {
+					processLetter(0);
+				} else if (tag.equals("Cond")) {
+					processCond(0);
+				} else if (tag.equals("Print")) {
+					processPrint(0);
+				} else if (tag.equals("Change")) {
+					processChange();
+				} else if (tag.equals("If")) {
+					processIf();
+				}
+
+				j++;
+			}
+
+			j = original;
+			currentStatement = "";
 		}
 	}
 
