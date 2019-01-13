@@ -246,8 +246,28 @@ public class Main extends JPanel {
 					currentStatement = codeList[i].replace("\r", "");
 					currentStatement = currentStatement.replace("\n", "");
 
-					ck = currentStatement.split(" ");
+					String[] temp = currentStatement.split("\\s");
 
+					int numWords = 0;
+					for (int j = 0; j < temp.length; j++) {
+						if (!temp[j].equals("")) {
+							numWords++;
+						}
+					}
+
+					ck = new String[numWords];
+
+					numWords = 0;
+					for (int j = 0; j < temp.length; j++) {
+						if (!temp[j].equals("")) {
+							ck[numWords] = temp[j];
+							numWords++;
+						}
+					}
+
+					if (numWords == 0) {
+						continue;
+					}
 					String tag = ck[0];
 
 					if (tag.equals("Number")) {
@@ -265,7 +285,9 @@ public class Main extends JPanel {
 					} else if (tag.equals("If")) {
 						processIf();
 					} else if (tag.equals("Loop")) {
-						processLoop(i);
+						processLoop(i + 1);
+					} else if (tag.equals("Input")) {
+						processInput(0);
 					}
 				}
 			}
@@ -299,7 +321,7 @@ public class Main extends JPanel {
 				StringBuffer buffer = new StringBuffer((int) file.length());
 				int i = 0;
 				while (fileIn.hasNextLine()) {
-//			        buffer.append(fileIn.nextLine());
+					// buffer.append(fileIn.nextLine());
 					if (i == 0) {
 						editor.setText(fileIn.nextLine());
 						i++;
@@ -661,7 +683,34 @@ public class Main extends JPanel {
 	}
 
 	public void processIf() {
-		if (getNumberCondition(ck[1] + " " + ck[2] + " " + ck[3])) {
+
+		boolean newVar = true, cond = false;
+		for (int i = 0; i < conds.size(); i++) {
+			if (ck[1].trim().equals(conds.get(i).getName())) {
+				newVar = false;
+				cond = conds.get(i).getCond();
+			}
+		}
+
+		if (!newVar) {
+			if (cond) {
+				String statementTag = ck[2];
+				if (statementTag.equals("Change"))
+					processChange(2);
+				else if (ck[2].equals("Print"))
+					processPrint(2);
+				else if (ck[2].equals("Input"))
+					processInput(2);
+				else if (ck[2].equals("Number"))
+					processNumber(2);
+				else if (ck[2].equals("Text"))
+					processText(2);
+				else if (ck[2].equals("Cond"))
+					processCond(2);
+				else if (ck[2].equals("Letter"))
+					processLetter(2);
+			}
+		} else if (getNumberCondition(ck[1] + " " + ck[2] + " " + ck[3])) {
 			String statementTag = ck[4];
 			if (statementTag.equals("Change"))
 				processChange(4);
@@ -712,9 +761,10 @@ public class Main extends JPanel {
 		int times = Integer.parseInt(ck[1]);
 		int original = j;
 		for (int i = 1; i < times; i++) {
+			currentStatement = codeList[j].replace("\r", "");
+			currentStatement = currentStatement.replace("\n", "");
 			while (!currentStatement.equals("End")) {
-				currentStatement = codeList[j].replace("\r", "");
-				currentStatement = currentStatement.replace("\n", "");
+
 				ck = currentStatement.split(" ");
 
 				String tag = ck[0];
@@ -743,6 +793,8 @@ public class Main extends JPanel {
 				}
 
 				j++;
+				currentStatement = codeList[j].replace("\r", "");
+				currentStatement = currentStatement.replace("\n", "");
 			}
 
 			j = original;
@@ -753,16 +805,24 @@ public class Main extends JPanel {
 	public void processInput(int index) {
 		if (ck[1 + index].equals("number")) {
 			double d = Double.parseDouble(JOptionPane.showInputDialog("Enter value for " + ck[2 + index]));
-			numbers.add(new Number(ck[2 + index], d));
+			if (isNewVariable(ck[2 + index])) {
+				numbers.add(new Number(ck[2 + index], d));
+			}
 		} else if (ck[1 + index].equals("text")) {
 			String s = JOptionPane.showInputDialog("Enter value for " + ck[2 + index]);
-			texts.add(new Text(ck[2 + index], s));
+			if (isNewVariable(ck[2 + index])) {
+				texts.add(new Text(ck[2 + index], s));
+			}
 		} else if (ck[1 + index].equals("cond")) {
 			boolean b = Boolean.parseBoolean(JOptionPane.showInputDialog("Enter value for " + ck[2 + index]));
-			conds.add(new Cond(ck[2 + index], b));
+			if (isNewVariable(ck[2 + index])) {
+				conds.add(new Cond(ck[2 + index], b));
+			}
 		} else if (ck[1 + index].equals("letter")) {
 			char l = JOptionPane.showInputDialog("Enter value for " + ck[2 + index]).charAt(0);
-			letters.add(new Letter(ck[2 + index], l));
+			if (isNewVariable(ck[2 + index])) {
+				letters.add(new Letter(ck[2 + index], l));
+			}
 		}
 	}
 
