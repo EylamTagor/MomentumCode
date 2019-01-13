@@ -2,8 +2,13 @@ package run;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -11,6 +16,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -45,6 +52,10 @@ public class Main extends JPanel {
 	private ArrayList<Cond> conds;
 	private ArrayList<Number> numbers;
 
+	private Color c = new Color(47, 47, 47);
+	private Color y = new Color(100, 221, 247); // Text
+	private Color p = new Color(255, 0, 0); // Highlight
+
 	public Main() {
 		numbers = new ArrayList<Number>();
 		texts = new ArrayList<Text>();
@@ -53,42 +64,126 @@ public class Main extends JPanel {
 		frmMomentum = new JFrame();
 		frmMomentum.setTitle("Momentum");
 		frmMomentum.setBounds(100, 100, 1100, 700);
+		frmMomentum.setBackground(c);
 		frmMomentum.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmMomentum.getContentPane().setLayout(new BorderLayout(0, 0));
+		frmMomentum.setResizable(false);
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane.setBackground(c);
 		frmMomentum.getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
 		JPanel console = new JPanel();
-		tabbedPane.addTab("Console", null, console, null);
+		Icon icon = new ImageIcon("m.gif");
+		console.setBackground(c);
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Image image = toolkit.getImage("cursor.gif");
+
+		Cursor cursor = toolkit.createCustomCursor(image, new Point(console.getX(), console.getY()), "img");
+		console.setCursor(cursor);
+		tabbedPane.addTab("omentum", icon, console, null);
 		console.setLayout(null);
 
+		JLabel editorLabel = new JLabel("Editor");
+		editorLabel.setForeground(Color.WHITE);
+		editorLabel.setBounds(675, 10, 100, 50);
+		editorLabel.setFont(editorLabel.getFont().deriveFont(Font.BOLD, 14f));
+		console.add(editorLabel);
+
 		JLabel consoleLabel = new JLabel("Console");
-		consoleLabel.setBounds(690, 0, 100, 50);
+		consoleLabel.setBounds(675, 450, 100, 50);
+		consoleLabel.setForeground(Color.WHITE);
+		consoleLabel.setFont(consoleLabel.getFont().deriveFont(Font.BOLD, 14f));
 		console.add(consoleLabel);
 
+		JLabel ceLine = new JLabel("");
+		ceLine.setBounds(350, 433, 720, 1);
+		ceLine.setBackground(Color.WHITE);
+		ceLine.setOpaque(true);
+		console.add(ceLine);
+
+		JLabel top = new JLabel("");
+		top.setBounds(350, 49, 720, 1);
+		top.setBackground(Color.WHITE);
+		top.setOpaque(true);
+		console.add(top);
+
+		JLabel bottom = new JLabel("");
+		bottom.setBounds(350, 625, 720, 1);
+		bottom.setBackground(Color.WHITE);
+		bottom.setOpaque(true);
+		console.add(bottom);
+
+		JLabel left = new JLabel("");
+		left.setBounds(349, 50, 1, 384);
+		left.setBackground(Color.WHITE);
+		left.setOpaque(true);
+		console.add(left);
+
+		JLabel right = new JLabel("");
+		right.setBounds(1070, 50, 1, 384);
+		right.setBackground(Color.WHITE);
+		right.setOpaque(true);
+		console.add(right);
+
+		JLabel cleft = new JLabel("");
+		cleft.setBounds(349, 490, 1, 135);
+		cleft.setBackground(Color.WHITE);
+		cleft.setOpaque(true);
+		console.add(cleft);
+
+		JLabel cright = new JLabel("");
+		cright.setBounds(1070, 490, 1, 135);
+		cright.setBackground(Color.WHITE);
+		cright.setOpaque(true);
+		console.add(cright);
+
+		JLabel ctop = new JLabel("");
+		ctop.setBounds(350, 489, 720, 1);
+		ctop.setBackground(Color.WHITE);
+		ctop.setOpaque(true);
+		console.add(ctop);
+
 		consoleArea = new JTextArea(100, 100);
-		consoleArea.setBounds(400, 45, 589, 316);
+		consoleArea.setBounds(350, 490, 720, 135);
 		consoleArea.setBackground(Color.WHITE);
 		consoleArea.setEditable(false);
+		consoleArea.setCursor(cursor);
+		consoleArea.setSelectedTextColor(p);
+		consoleArea.setSelectionColor(c);
+		consoleArea.setFont(new Font(Font.MONOSPACED, Font.BOLD, 12));
+		consoleArea.setForeground(Color.WHITE);
+
+		consoleArea.setBackground(c);
 		scroll = new JScrollPane(consoleArea);
 		scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		console.add(scroll);
 		console.add(consoleArea);
 
 		editor = new JTextArea(100, 100);
-		editor.setBounds(21, 100, 316, 400);
-		editor.setBackground(Color.WHITE);
+		editor.setBounds(350, 50, 720, 383);
+		editor.setBackground(c);
+		editor.setSelectedTextColor(p);
+		editor.setSelectionColor(c);
+		editor.setForeground(y);
+		editor.setCursor(cursor);
+		editor.setFont(new Font(Font.MONOSPACED, Font.BOLD, 12));
 		scroll2 = new JScrollPane(editor);
 		scroll2.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		console.add(scroll2);
 		console.add(editor);
 
-		JLabel openFiles = new JLabel("Select a .mc or .txt file");
-		openFiles.setBounds(21, 10, 137, 25);
+		JLabel openFiles = new JLabel("Select a .mc or .txt file or start directly");
+		JLabel t = new JLabel("programming in the editor!");
+		t.setBounds(10, 15, 800, 50);
+		openFiles.setBounds(10, 0, 800, 50);
+		openFiles.setForeground(Color.WHITE);
+		t.setForeground(Color.WHITE);
+		console.add(t);
 		console.add(openFiles);
 
-		JButton fileButton = new JButton("Open");
+		JButton fileButton = new JButton("Import an Existing File");
+		Icon i = new ImageIcon("dl.gif");
 		JButton runButton = new JButton("Run");
 
 		runButton.addActionListener(new ActionListener() {
@@ -130,6 +225,7 @@ public class Main extends JPanel {
 		fileButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				chooser = new JFileChooser();
+				chooser.setCursor(cursor);
 				filter = new FileNameExtensionFilter(".mc or .txt files", "txt", "mc");
 				chooser.setFileFilter(filter);
 				int returnedValue = chooser.showOpenDialog(console);
@@ -145,11 +241,13 @@ public class Main extends JPanel {
 
 			}
 		});
-		fileButton.setBounds(21, 45, 117, 25);
+		fileButton.setBounds(5, 55, 200, 25);
 		console.add(fileButton);
 
-		runButton.setBounds(200, 45, 117, 25);
+		runButton.setBounds(343, 10, 117, 25);
+		runButton.setForeground(Color.GREEN);
 		console.add(runButton);
+
 	}
 
 	public ArrayList<Text> getText() {
@@ -181,33 +279,25 @@ public class Main extends JPanel {
 		if (cond.contains(">=")) {
 			op = ">=";
 			opNum = 3;
-//			System.out.println(1);
 		} else if (cond.contains("<=")) {
 			op = "<=";
 			opNum = 4;
-//			System.out.println(2);
 		} else if (cond.contains(">")) {
 			op = ">";
 			opNum = 1;
-//			System.out.println(3);
 		} else if (cond.contains("<")) {
 			op = "<";
 			opNum = 2;
-//			System.out.println(4);
 		} else if (cond.contains("==")) {
 			op = "==";
 			opNum = 5;
-//			System.out.println(5);
 		} else if (cond.contains("!=")) {
 			op = "!=";
 			opNum = 6;
-//			System.out.println(6);
 		}
 
 		String s1 = cond.substring(0, cond.indexOf(op)).trim(),
 				s2 = cond.substring(cond.indexOf(op) + op.length()).trim();
-//		System.out.println("s1 = " + s1);
-//		System.out.println("s2 = " + s2);
 		boolean s1hardCoded = true, s2hardCoded = true;
 
 		for (int i = 0; i < s1.length(); i++) {
@@ -215,20 +305,14 @@ public class Main extends JPanel {
 				s1hardCoded = false;
 		}
 
-//		System.out.println("s1hc" + s1hardCoded);
-
 		for (int i = 0; i < s2.length(); i++) {
 			if (!Character.isDigit(s2.charAt(i)) && s2.charAt(i) != '.') {
-//				System.out.println("bjafobsnfobsanfobjfsa " + s2.charAt(i));
 				s2hardCoded = false;
 			}
 		}
 
-//		System.out.println("s2hc" + s2hardCoded);
-
 		if (s1hardCoded) {
 			d1 = Double.parseDouble(s1);
-//			System.out.println("hd1 = " + d1);
 		} else {
 			for (int i = 0; i < numbers.size(); i++) {
 				if (s1.contains(numbers.get(i).getName()))
@@ -238,7 +322,6 @@ public class Main extends JPanel {
 
 		if (s2hardCoded) {
 			d2 = Double.parseDouble(s2);
-//			System.out.println("hd2 = " + d2);
 		} else {
 			for (int i = 0; i < numbers.size(); i++) {
 				if (s2.contains(numbers.get(i).getName()))
@@ -246,27 +329,18 @@ public class Main extends JPanel {
 			}
 		}
 
-//		System.out.println("d1 = " + d1);
-//		System.out.println("d2 = " + d2);
-
 		switch (opNum) {
 		case 1:
-//			System.out.println(d1 > d2);
 			return d1 > d2;
 		case 2:
-//			System.out.println(d1 < d2);
 			return d1 < d2;
 		case 3:
-//			System.out.println(d1 >= d2);
 			return d1 >= d2;
 		case 4:
-//			System.out.println(d1 <= d2);
 			return d1 <= d2;
 		case 5:
-//			System.out.println(Math.abs(d1 - d2) < 0.00001);
 			return Math.abs(d1 - d2) < 0.00001;
 		case 6:
-//			System.out.println(d1 != d2);
 			return d1 != d2;
 		default:
 			throw new IllegalArgumentException("Invalid operation");
@@ -274,27 +348,27 @@ public class Main extends JPanel {
 	}
 
 	public void changeNumber() {
-		if (ck[2].equals("=")) {
+		if (ck[2].trim().equals("=")) {
 			for (int i = 0; i < numbers.size(); i++) {
 				if (numbers.get(i).getName().trim().equals(ck[1]))
 					numbers.get(i).setValue(Double.parseDouble(ck[3]));
 			}
-		} else if (ck[2].equals("+=")) {
+		} else if (ck[2].trim().equals("+=")) {
 			for (int i = 0; i < numbers.size(); i++) {
 				if (numbers.get(i).getName().trim().equals(ck[1]))
 					numbers.get(i).add(Double.parseDouble(ck[3]));
 			}
-		} else if (ck[2].equals("-=")) {
+		} else if (ck[2].trim().equals("-=")) {
 			for (int i = 0; i < numbers.size(); i++) {
 				if (numbers.get(i).getName().trim().equals(ck[1]))
 					numbers.get(i).subtract(Double.parseDouble(ck[3]));
 			}
-		} else if (ck[2].equals("*=")) {
+		} else if (ck[2].trim().equals("*=")) {
 			for (int i = 0; i < numbers.size(); i++) {
 				if (numbers.get(i).getName().trim().equals(ck[1]))
 					numbers.get(i).multiplyBy(Double.parseDouble(ck[3]));
 			}
-		} else if (ck[2].equals("/=")) {
+		} else if (ck[2].trim().equals("/=")) {
 			for (int i = 0; i < numbers.size(); i++) {
 				if (numbers.get(i).getName().trim().equals(ck[1]))
 					numbers.get(i).divideBy(Double.parseDouble(ck[3]));
@@ -317,23 +391,6 @@ public class Main extends JPanel {
 	}
 
 	public void changeText() {
-//		String s = change.substring(change.indexOf("\""), change.lastIndexOf("\"")).trim();
-//		if (change.contains("+=")) {
-//			String name = change.substring(8, change.indexOf("+")).trim();
-//			for (int i = 0; i < texts.size(); i++) {
-//				if (texts.get(i).getName().trim().equals(name)) {
-//					texts.get(i).addText(s);
-//				}
-//			}
-//		} else if (change.contains("=")) {
-//			String name = change.substring(8, change.indexOf("=")).trim();
-//			for (int i = 0; i < texts.size(); i++) {
-//				if (texts.get(i).getName().trim().equals(name)) {
-//					texts.get(i).setText(s.substring(1));
-//				}
-//			}
-//		}
-
 		if (ck[2].trim().equals("=")) {
 			for (int i = 0; i < texts.size(); i++) {
 				if (texts.get(i).getName().trim().equals(ck[1])) {
@@ -353,42 +410,11 @@ public class Main extends JPanel {
 	}
 
 	public void changeLetter() {
-//		char c = change.charAt(change.lastIndexOf("\'") - 1);
-//		String name = change.substring(0, change.indexOf("=")).trim();
-//		for (int i = 0; i < letters.size(); i++) {
-//			if (letters.get(i).getName().trim().equals(name)) {
-//				letters.get(i).setLetter(c);
-//			}
-//		}
-
 		for (int i = 0; i < letters.size(); i++) {
 			if (letters.get(i).getName().trim().equals(ck[1]))
 				letters.get(i).setLetter(ck[3].charAt(1));
 		}
 	}
-
-//	public void processContainer(int index, String dataType) {
-//		if (isNewVariable(ck[1 + index])) {
-//			if (dataType.equals("number")) {
-//				if (!ck[3 + index].contains("."))
-//					ck[3 + index] = ck[3 + index] + ".0";
-//				numbers.add(new Number(ck[2 + index], Double.parseDouble(ck[4 + index])));
-//			} else if (dataType.equals("text")) {
-//				String txt = ck[3 + index];
-//				for (int j = 4; j < ck.length; j++)
-//					txt += " " + ck[j + index];
-//				texts.add(new Text(ck[1 + index], txt));
-//
-//			} else if (dataType.equals("cond")) {
-//				if (ck[3 + index].equals("true"))
-//					conds.add(new Cond(ck[1 + index], true));
-//				else
-//					conds.add(new Cond(ck[1 + index], false));
-//			}
-//			if (dataType.equals("letter"))
-//				letters.add(new Letter(ck[1 + index], ck[3 + index].charAt(0)));
-//		}
-//	}
 
 	public void processNumber(int index) {
 		if (isNewVariable(ck[1 + index])) {
@@ -406,28 +432,57 @@ public class Main extends JPanel {
 			for (int i = 3 + index; i < ck.length; i++) {
 				if (isQuote) {
 					if (ck[i].equals("")) {
-						consoleArea.append(" ");
+						txt += (" ");
 					} else if (ck[i].charAt(ck[i].length() - 1) == '"') {
 						isQuote = !isQuote;
-						consoleArea.append(ck[i].substring(0, ck[i].length() - 1) + " ");
+						txt += (ck[i].substring(0, ck[i].length() - 1) + " ");
 					} else
-						consoleArea.append(ck[i] + " ");
+						txt += (ck[i] + " ");
 				} else {
 
 					if (!ck[i].equals("") && ck[i].charAt(0) == '"') {
 						isQuote = !isQuote;
 						if (ck[i].charAt(ck[i].length() - 1) == '"' && ck[i].length() != 1) {
-							consoleArea.append(ck[i].substring(1, ck[i].length() - 1) + " ");
+							txt += (ck[i].substring(1, ck[i].length() - 1) + "");
 							isQuote = !isQuote;
 						} else
-							consoleArea.append(ck[i].substring(1) + " ");
+							txt += (ck[i].substring(1) + " ");
 					} else
-						printVariable(ck[i]);
+						txt += getVariable(ck[i]);
 				}
 
 			}
+			texts.add(new Text(ck[1 + index], txt));
 
 		}
+	}
+
+	private String getVariable(String name) {
+		for (int i = 0; i < conds.size(); i++) {
+
+			if (name.equals(conds.get(i).getName())) {
+				return conds.get(i).getCond() + "";
+			}
+		}
+		for (int i = 0; i < texts.size(); i++) {
+			if (name.equals(texts.get(i).getName())) {
+				return texts.get(i).getText().substring(1, texts.get(i).getText().length() - 1) + "";
+			}
+		}
+
+		for (int i = 0; i < numbers.size(); i++) {
+			if (name.equals(numbers.get(i).getName())) {
+				return (numbers.get(i).getValue() + "");
+			}
+		}
+
+		for (int i = 0; i < letters.size(); i++) {
+			if (name.equals(letters.get(i).getName())) {
+				return (letters.get(i).getLetter() + "");
+
+			}
+		}
+		return "none";
 	}
 
 	public void processCond(int index) {
@@ -453,14 +508,14 @@ public class Main extends JPanel {
 					consoleArea.append(" ");
 				} else if (ck[j].charAt(ck[j].length() - 1) == '"') {
 					isQuote = !isQuote;
-					consoleArea.append(ck[j].substring(0, ck[j].length() - 1) + " ");
+					consoleArea.append(ck[j].substring(0, ck[j].length() - 1) + "");
 				} else
 					consoleArea.append(ck[j] + " ");
 			} else {
 				if (!ck[j].equals("") && ck[j].charAt(0) == '"') {
 					isQuote = !isQuote;
 					if (ck[j].charAt(ck[j].length() - 1) == '"' && ck[j].length() != 1) {
-						consoleArea.append(ck[j].substring(1, ck[j].length() - 1) + " ");
+						consoleArea.append(ck[j].substring(1, ck[j].length() - 1) + "");
 						isQuote = !isQuote;
 					} else
 						consoleArea.append(ck[j].substring(1) + " ");
@@ -474,16 +529,12 @@ public class Main extends JPanel {
 	}
 
 	public void processIf() {
-//		System.out.println(ck[1] + " " + ck[2] + " " + ck[3]);
-//		System.out.println(getNumberCondition(ck[1] + " " + ck[2] + " " + ck[3]));
 		if (getNumberCondition(ck[1] + " " + ck[2] + " " + ck[3])) {
 			String statementTag = ck[4];
 			if (statementTag.equals("Change"))
 				processChange();
 			else if (ck[4].equals("Print"))
 				processPrint(4);
-//			else if (ck[4].equals("Container"))
-//				processContainer(4, ck[5]);
 		}
 	}
 
@@ -599,14 +650,14 @@ public class Main extends JPanel {
 		for (int i = 0; i < conds.size(); i++) {
 
 			if (name.equals(conds.get(i).getName())) {
-				consoleArea.append(conds.get(i).getCond() + " ");
+				consoleArea.append(conds.get(i).getCond() + "");
 				printed = true;
 			}
 		}
 		if (!printed) {
 			for (int i = 0; i < texts.size(); i++) {
 				if (name.equals(texts.get(i).getName())) {
-					consoleArea.append(texts.get(i).getText().substring(1, texts.get(i).getText().length() - 1) + " ");
+					consoleArea.append(texts.get(i).getText().substring(0, texts.get(i).getText().length()) + "");
 					printed = true;
 				}
 			}
@@ -614,7 +665,7 @@ public class Main extends JPanel {
 		if (!printed) {
 			for (int i = 0; i < numbers.size(); i++) {
 				if (name.equals(numbers.get(i).getName())) {
-					consoleArea.append(numbers.get(i).getValue() + " ");
+					consoleArea.append(numbers.get(i).getValue() + "");
 					printed = true;
 				}
 			}
@@ -622,7 +673,7 @@ public class Main extends JPanel {
 		if (!printed) {
 			for (int i = 0; i < letters.size(); i++) {
 				if (name.equals(letters.get(i).getName())) {
-					consoleArea.append(letters.get(i).getLetter() + " ");
+					consoleArea.append(letters.get(i).getLetter() + "");
 
 					printed = true;
 				}
