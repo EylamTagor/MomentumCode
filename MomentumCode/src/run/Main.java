@@ -625,11 +625,20 @@ public class Main extends JPanel {
 	public void processIf() {
 		if (getNumberCondition(ck[1] + " " + ck[2] + " " + ck[3])) {
 			String statementTag = ck[4];
-			if (statementTag.equals("Change")) {
+			if (statementTag.equals("Change"))
 				processChange(4);
-			} else if (ck[4].equals("Print")) {
+			else if (ck[4].equals("Print"))
 				processPrint(4);
-			}
+			else if (ck[4].equals("Input"))
+				processInput(4);
+			else if (ck[4].equals("Number"))
+				processNumber(4);
+			else if (ck[4].equals("Text"))
+				processText(4);
+			else if (ck[4].equals("Cond"))
+				processCond(4);
+			else if (ck[4].equals("Letter"))
+				processLetter(4);
 		}
 	}
 
@@ -686,6 +695,8 @@ public class Main extends JPanel {
 					processChange(0);
 				} else if (tag.equals("If")) {
 					processIf();
+				} else if (tag.equals("Input")) {
+					processInput(0);
 				}
 
 				j++;
