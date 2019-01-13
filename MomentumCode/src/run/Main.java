@@ -213,8 +213,28 @@ public class Main extends JPanel {
 					currentStatement = codeList[i].replace("\r", "");
 					currentStatement = currentStatement.replace("\n", "");
 
-					ck = currentStatement.split(" ");
+					String[] temp = currentStatement.split("\\s");
 
+					int numWords = 0;
+					for (int j = 0; j < temp.length; j++) {
+						if (!temp[j].equals("")) {
+							numWords++;
+						}
+					}
+
+					ck = new String[numWords];
+
+					numWords = 0;
+					for (int j = 0; j < temp.length; j++) {
+						if (!temp[j].equals("")) {
+							ck[numWords] = temp[j];
+							numWords++;
+						}
+					}
+
+					if (numWords == 0) {
+						continue;
+					}
 					String tag = ck[0];
 
 					if (tag.equals("Number")) {
