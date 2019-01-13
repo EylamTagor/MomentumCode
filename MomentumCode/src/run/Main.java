@@ -13,6 +13,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -22,6 +25,7 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -29,9 +33,9 @@ import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import variables.Number;
 import variables.Cond;
 import variables.Letter;
-import variables.Number;
 import variables.Text;
 
 public class Main extends JPanel {
@@ -51,7 +55,6 @@ public class Main extends JPanel {
 	private ArrayList<Letter> letters;
 	private ArrayList<Cond> conds;
 	private ArrayList<Number> numbers;
-
 	private Color c = new Color(47, 47, 47);
 	private Color y = new Color(100, 221, 247); // Text
 	private Color p = new Color(255, 0, 0); // Highlight
@@ -62,7 +65,7 @@ public class Main extends JPanel {
 		conds = new ArrayList<Cond>();
 		letters = new ArrayList<Letter>();
 		frmMomentum = new JFrame();
-		frmMomentum.setTitle("Momentum");
+		frmMomentum.setTitle("Momentum IDE for Beginning Developers");
 		frmMomentum.setBounds(100, 100, 1100, 700);
 		frmMomentum.setBackground(c);
 		frmMomentum.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -74,14 +77,14 @@ public class Main extends JPanel {
 		frmMomentum.getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
 		JPanel console = new JPanel();
-		Icon icon = new ImageIcon("m.gif");
+//		Icon icon = new ImageIcon("m.gif");
 		console.setBackground(c);
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
 		Image image = toolkit.getImage("cursor.gif");
 
 		Cursor cursor = toolkit.createCustomCursor(image, new Point(console.getX(), console.getY()), "img");
 		console.setCursor(cursor);
-		tabbedPane.addTab("omentum", icon, console, null);
+		tabbedPane.addTab("Momentum", null, console, null);
 		console.setLayout(null);
 
 		JLabel editorLabel = new JLabel("Editor");
@@ -151,13 +154,17 @@ public class Main extends JPanel {
 		consoleArea.setCursor(cursor);
 		consoleArea.setSelectedTextColor(p);
 		consoleArea.setSelectionColor(c);
-		consoleArea.setFont(new Font(Font.MONOSPACED, Font.BOLD, 12));
+		consoleArea.setFont(new Font(Font.MONOSPACED, Font.BOLD, 14));
 		consoleArea.setForeground(Color.WHITE);
 
+		JScrollPane consolePane = new JScrollPane(editor, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
 		consoleArea.setBackground(c);
-		scroll = new JScrollPane(consoleArea);
-		scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		console.add(scroll);
+//		scroll = new JScrollPane(consoleArea);
+//		scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+//		console.add(scroll);
+		console.add(consolePane);
 		console.add(consoleArea);
 
 		editor = new JTextArea(100, 100);
@@ -167,24 +174,33 @@ public class Main extends JPanel {
 		editor.setSelectionColor(c);
 		editor.setForeground(y);
 		editor.setCursor(cursor);
-		editor.setFont(new Font(Font.MONOSPACED, Font.BOLD, 12));
-		scroll2 = new JScrollPane(editor);
-		scroll2.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		console.add(scroll2);
+		editor.setCaretColor(Color.RED);
+		editor.setFont(new Font(Font.MONOSPACED, Font.BOLD, 14));
+		JScrollPane editorPane = new JScrollPane(editor, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+//		scroll2 = new JScrollPane(editor);
+//		scroll2.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+//		console.add(scroll2);
+		console.add(editorPane, BorderLayout.EAST);
 		console.add(editor);
 
 		JLabel openFiles = new JLabel("Select a .mc or .txt file or start directly");
 		JLabel t = new JLabel("programming in the editor!");
-		t.setBounds(10, 15, 800, 50);
-		openFiles.setBounds(10, 0, 800, 50);
+		t.setBounds(85, 15, 800, 50);
+		openFiles.setBounds(50, 0, 800, 50);
 		openFiles.setForeground(Color.WHITE);
 		t.setForeground(Color.WHITE);
 		console.add(t);
 		console.add(openFiles);
 
-		JButton fileButton = new JButton("Import an Existing File");
 		Icon i = new ImageIcon("dl.gif");
-		JButton runButton = new JButton("Run");
+		JButton fileButton = new JButton("Open an Existing File", i);
+
+		Icon export = new ImageIcon("export.gif");
+		JButton saveButton = new JButton("Save the Current File", export);
+
+		Icon run = new ImageIcon("run.gif");
+		JButton runButton = new JButton("Run", run);
 
 		runButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -212,11 +228,13 @@ public class Main extends JPanel {
 					} else if (tag.equals("Print")) {
 						processPrint(0);
 					} else if (tag.equals("Change")) {
-						processChange();
+						processChange(0);
 					} else if (tag.equals("If")) {
 						processIf();
 					} else if (tag.equals("Loop")) {
 						processLoop(i);
+					} else if (tag.equals("Input")) {
+						processInput(0);
 					}
 				}
 			}
@@ -241,11 +259,40 @@ public class Main extends JPanel {
 
 			}
 		});
-		fileButton.setBounds(5, 55, 200, 25);
+
+		saveButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				String pathname = System.getProperty("user.dir") + "/";
+				JFileChooser fileChooser = new JFileChooser(pathname);
+				fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				int result = fileChooser.showSaveDialog(null);
+				if (result == JFileChooser.CANCEL_OPTION)
+					return;
+
+				File file = fileChooser.getSelectedFile();
+				if (file != null) {
+					pathname = file.getAbsolutePath();
+					PrintWriter fileOut;
+					try {
+						fileOut = new PrintWriter(new FileWriter(file));
+					} catch (IOException ex) {
+						System.out.println("*** Can't create file ***");
+						return;
+					}
+
+					fileOut.close();
+				}
+			}
+
+		});
+		fileButton.setBounds(15, 55, 150, 25);
 		console.add(fileButton);
 
-		runButton.setBounds(343, 10, 117, 25);
-		runButton.setForeground(Color.GREEN);
+		saveButton.setBounds(180, 55, 150, 25);
+		console.add(saveButton);
+
+		runButton.setBounds(349, 25, 117, 20);
+		runButton.setForeground(new Color(87, 182, 65));
 		console.add(runButton);
 
 	}
@@ -347,72 +394,99 @@ public class Main extends JPanel {
 		}
 	}
 
-	public void changeNumber() {
-		if (ck[2].trim().equals("=")) {
+	public void changeNumber(int index) {
+		System.out.println(index);
+		if (ck[2 + index].trim().equals("=")) {
 			for (int i = 0; i < numbers.size(); i++) {
-				if (numbers.get(i).getName().trim().equals(ck[1]))
-					numbers.get(i).setValue(Double.parseDouble(ck[3]));
+				if (numbers.get(i).getName().trim().equals(ck[1 + index]))
+					numbers.get(i).setValue(Double.parseDouble(ck[3 + index]));
 			}
-		} else if (ck[2].trim().equals("+=")) {
+		} else if (ck[2 + index].trim().equals("+=")) {
 			for (int i = 0; i < numbers.size(); i++) {
-				if (numbers.get(i).getName().trim().equals(ck[1]))
-					numbers.get(i).add(Double.parseDouble(ck[3]));
+				if (numbers.get(i).getName().trim().equals(ck[1 + index]))
+					numbers.get(i).add(Double.parseDouble(ck[3 + index]));
 			}
-		} else if (ck[2].trim().equals("-=")) {
+		} else if (ck[2 + index].trim().equals("-=")) {
 			for (int i = 0; i < numbers.size(); i++) {
-				if (numbers.get(i).getName().trim().equals(ck[1]))
-					numbers.get(i).subtract(Double.parseDouble(ck[3]));
+				if (numbers.get(i).getName().trim().equals(ck[1 + index]))
+					numbers.get(i).subtract(Double.parseDouble(ck[3 + index]));
 			}
-		} else if (ck[2].trim().equals("*=")) {
+		} else if (ck[2 + index].trim().equals("*=")) {
 			for (int i = 0; i < numbers.size(); i++) {
-				if (numbers.get(i).getName().trim().equals(ck[1]))
-					numbers.get(i).multiplyBy(Double.parseDouble(ck[3]));
+				if (numbers.get(i).getName().trim().equals(ck[1 + index]))
+					numbers.get(i).multiplyBy(Double.parseDouble(ck[3 + index]));
 			}
-		} else if (ck[2].trim().equals("/=")) {
+		} else if (ck[2 + index].trim().equals("/=")) {
 			for (int i = 0; i < numbers.size(); i++) {
-				if (numbers.get(i).getName().trim().equals(ck[1]))
-					numbers.get(i).divideBy(Double.parseDouble(ck[3]));
+				if (numbers.get(i).getName().trim().equals(ck[1 + index]))
+					numbers.get(i).divideBy(Double.parseDouble(ck[3 + index]));
 			}
 		}
 	}
 
-	public void changeCond() {
-		if (ck[3].equals("true")) {
+	public void changeCond(int index) {
+		if (ck[3 + index].equals("true")) {
 			for (int i = 0; i < conds.size(); i++) {
-				if (conds.get(i).getName().trim().equals(ck[1]))
+				if (conds.get(i).getName().trim().equals(ck[1 + index]))
 					conds.get(i).setCond(true);
 			}
-		} else if (ck[3].equals("false")) {
+		} else if (ck[3 + index].equals("false")) {
 			for (int i = 0; i < conds.size(); i++) {
-				if (conds.get(i).getName().trim().equals(ck[1]))
+				if (conds.get(i).getName().trim().equals(ck[1 + index]))
 					conds.get(i).setCond(false);
 			}
 		}
 	}
 
-	public void changeText() {
-		if (ck[2].trim().equals("=")) {
-			for (int i = 0; i < texts.size(); i++) {
-				if (texts.get(i).getName().trim().equals(ck[1])) {
-					texts.get(i).setText(currentStatement.substring(currentStatement.indexOf("\""),
-							currentStatement.lastIndexOf("\"") + 1));
+	public void changeText(int ind) {
+		String s = "";
+		boolean isQuote = false;
+		int index = 0;
+		for (int i = 0; i < texts.size(); i++) {
+			if (texts.get(i).getName().trim().equals(ck[1 + ind])) {
+				index = i;
+				if (ck[2 + ind].equals("=")) {
+					s = "";
+				} else if (ck[2 + ind].equals("+=")) {
+					s = texts.get(i).getText();
 				}
+				isQuote = true;
 			}
-		} else if (ck[2].trim().equals("+=")) {
-			for (int i = 0; i < texts.size(); i++) {
-				if (texts.get(i).getName().trim().equals(ck[1])) {
-					System.out.println(texts.get(i).getText());
-					texts.get(i).setText(texts.get(i).getText() + currentStatement
-							.substring(currentStatement.indexOf("\""), currentStatement.lastIndexOf("\"") + 1));
+		}
+
+		if (isQuote) {
+			isQuote = false;
+			for (int i = 3 + ind; i < ck.length; i++) {
+				if (isQuote) {
+					if (ck[i].equals("")) {
+						s += (" ");
+					} else if (ck[i].charAt(ck[i].length() - 1) == '"') {
+						isQuote = !isQuote;
+						s += (ck[i].substring(0, ck[i].length() - 1) + "");
+					} else
+						s += (ck[i] + " ");
+				} else {
+
+					if (!ck[i].equals("") && ck[i].charAt(0) == '"') {
+						isQuote = !isQuote;
+						if (ck[i].charAt(ck[i].length() - 1) == '"' && ck[i].length() != 1) {
+							s += (ck[i].substring(1, ck[i].length() - 1) + "");
+							isQuote = !isQuote;
+						} else
+							s += (ck[i].substring(1) + " ");
+					} else
+						s += getVariable(ck[i]);
 				}
+
 			}
+			texts.get(index).setText(s);
 		}
 	}
 
-	public void changeLetter() {
+	public void changeLetter(int index) {
 		for (int i = 0; i < letters.size(); i++) {
-			if (letters.get(i).getName().trim().equals(ck[1]))
-				letters.get(i).setLetter(ck[3].charAt(1));
+			if (letters.get(i).getName().trim().equals(ck[1 + index]))
+				letters.get(i).setLetter(ck[3 + index].charAt(1));
 		}
 	}
 
@@ -435,7 +509,7 @@ public class Main extends JPanel {
 						txt += (" ");
 					} else if (ck[i].charAt(ck[i].length() - 1) == '"') {
 						isQuote = !isQuote;
-						txt += (ck[i].substring(0, ck[i].length() - 1) + " ");
+						txt += (ck[i].substring(0, ck[i].length() - 1) + "");
 					} else
 						txt += (ck[i] + " ");
 				} else {
@@ -531,37 +605,38 @@ public class Main extends JPanel {
 	public void processIf() {
 		if (getNumberCondition(ck[1] + " " + ck[2] + " " + ck[3])) {
 			String statementTag = ck[4];
-			if (statementTag.equals("Change"))
-				processChange();
-			else if (ck[4].equals("Print"))
+			if (statementTag.equals("Change")) {
+				processChange(4);
+			} else if (ck[4].equals("Print")) {
 				processPrint(4);
+			}
 		}
 	}
 
-	public void processChange() {
+	public void processChange(int index) {
 		String dataType = "";
 		for (int b = 0; b < numbers.size(); b++) {
-			if (numbers.get(b).getName().trim().equals(ck[1])) {
+			if (numbers.get(b).getName().trim().equals(ck[1 + index])) {
 				dataType = "number";
-				changeNumber();
+				changeNumber(index);
 			}
 		}
 		for (int y = 0; y < conds.size(); y++) {
-			if (conds.get(y).getName().trim().equals(ck[1])) {
+			if (conds.get(y).getName().trim().equals(ck[1 + index])) {
 				dataType = "cond";
-				changeCond();
+				changeCond(index);
 			}
 		}
 		for (int x = 0; x < texts.size(); x++) {
-			if (texts.get(x).getName().trim().equals(ck[1])) {
+			if (texts.get(x).getName().trim().equals(ck[1 + index])) {
 				dataType = "text";
-				changeText();
+				changeText(index);
 			}
 		}
 		for (int e = 0; e < letters.size(); e++) {
-			if (letters.get(e).getName().trim().equals(ck[1])) {
+			if (letters.get(e).getName().trim().equals(ck[1 + index])) {
 				dataType = "letter";
-				changeLetter();
+				changeLetter(index);
 			}
 		}
 	}
@@ -588,7 +663,7 @@ public class Main extends JPanel {
 				} else if (tag.equals("Print")) {
 					processPrint(0);
 				} else if (tag.equals("Change")) {
-					processChange();
+					processChange(0);
 				} else if (tag.equals("If")) {
 					processIf();
 				}
@@ -598,6 +673,22 @@ public class Main extends JPanel {
 
 			j = original;
 			currentStatement = "";
+		}
+	}
+
+	public void processInput(int index) {
+		if (ck[1 + index].equals("number")) {
+			double d = Double.parseDouble(JOptionPane.showInputDialog("Enter value for " + ck[2 + index]));
+			numbers.add(new Number(ck[2 + index], d));
+		} else if (ck[1 + index].equals("text")) {
+			String s = JOptionPane.showInputDialog("Enter value for " + ck[2 + index]);
+			texts.add(new Text(ck[2 + index], s));
+		} else if (ck[1 + index].equals("cond")) {
+			boolean b = Boolean.parseBoolean(JOptionPane.showInputDialog("Enter value for " + ck[2 + index]));
+			conds.add(new Cond(ck[2 + index], b));
+		} else if (ck[1 + index].equals("letter")) {
+			char l = JOptionPane.showInputDialog("Enter value for " + ck[2 + index]).charAt(0);
+			letters.add(new Letter(ck[2 + index], l));
 		}
 	}
 
